@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -141,6 +140,15 @@ table.qt td.n{direction:ltr}
 .busy{position:fixed;inset:0;background:rgba(244,244,242,.96);z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;font-weight:700;color:var(--navy)}
 .busy.on{display:flex}
 #render-stage{position:absolute;top:0;right:0;z-index:-1;pointer-events:none}
+#print-area{display:none}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#fff!important}
+  body>*:not(#print-area){display:none!important}
+  #print-area{display:block!important}
+  #print-area .qpage{box-shadow:none;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print-area .qpage:last-child{page-break-after:auto;break-after:auto}
+}
 .hint{background:#fdf6dc;border:1px solid #f0dc96;color:#5c4300;border-radius:10px;padding:8px 12px;font-size:13px}
 .empty{text-align:center;color:var(--muted);padding:30px 10px}
 </style>
@@ -170,7 +178,7 @@ table.qt td.n{direction:ltr}
       <label class="f">اسم المشروع<input id="q-project" data-q="project"></label>
       <label class="f">تليفون العميل<input id="q-phone" data-q="phone" inputmode="tel"></label>
       <label class="f">تاريخ عرض السعر<input id="q-date" data-q="date" type="date"></label>
-      <label class="f">الموتور الافتراضي للفتحات الجديدة<select id="q-brand" data-q="brand"></select></label>
+      <label class="f">الموتور لكل الفتحات<select id="q-brand"></select></label>
     </div>
    </div>
 
@@ -178,8 +186,7 @@ table.qt td.n{direction:ltr}
     <div class="row" style="margin-bottom:10px">
       <h2 style="margin:0">الفتحات <span class="chip" id="opcount">0</span></h2>
       <span class="sp"></span>
-      <label class="chk"><input type="checkbox" id="q-hfdef"> هارد فوم للفتحات الجديدة</label>
-      <label class="chk"><input type="checkbox" id="q-swdef"> مفتاح شنايدر للفتحات الجديدة</label>
+      <label class="chk"><input type="checkbox" id="q-swdef"> مفتاح شنايدر لكل الفتحات</label>
     </div>
     <div id="ops"></div>
     <div class="row">
@@ -235,6 +242,8 @@ table.qt td.n{direction:ltr}
     <div class="row">
       <button class="btn" id="back-edit">→ رجوع للتعديل</button>
       <span class="sp"></span>
+      <button class="btn" id="print-btn">🖨 طباعة / حفظ PDF</button>
+      <button class="btn" id="share-btn" style="display:none">📤 مشاركة (واتساب)</button>
       <button class="btn acc" id="pdf-btn">⬇ تحميل PDF</button>
     </div>
     <div class="muted" id="pdf-note" style="margin-top:6px"></div>
@@ -361,6 +370,7 @@ table.qt td.n{direction:ltr}
 <div class="toast" id="toast"></div>
 <div class="busy" id="busy"><div style="font-size:30px">⏳</div><div id="busy-t">جارٍ إنشاء ملف PDF…</div></div>
 <div id="render-stage"></div>
+<div id="print-area"></div>
 <datalist id="loc-list"></datalist>
 
 <script>
@@ -503,7 +513,7 @@ var LS_S='ultra_settings_v1', LS_Q='ultra_quotes_v1';
 
 function newQuote(){
   return {id:uid(),no:'',client:'',attn:'',project:'',phone:'',date:today(),brand:'none',
-    swdef:true,hfdef:false,items:[],tmode:'cairo',tman:'',disc:0,vat:false,terms:S.terms.join('\n'),notes:'',created:Date.now(),updated:Date.now()};
+    swdef:true,items:[],tmode:'cairo',tman:'',disc:0,vat:false,terms:S.terms.join('\n'),notes:'',created:Date.now(),updated:Date.now()};
 }
 function nextNo(){
   var y=new Date().getFullYear(), mx=0;
@@ -512,7 +522,9 @@ function nextNo(){
 }
 function newItem(){
   var n=Q.items.length+1;
-  return {loc:'',code:'W'+n,w:'',h:'',sys:'auto',brand:Q.brand||'none',cap:'',rcv:false,rmt:false,hf:!!Q.hfdef,sw:!!Q.swdef};
+  var L=Q.items[Q.items.length-1];
+  if(L) return {loc:'',code:'W'+n,w:'',h:'',sys:L.sys||'auto',brand:L.brand||'none',cap:'',rcv:!!(L.rcv||L.rmt),rmt:false,hf:L.hf?'1':'',sw:!!L.sw};
+  return {loc:'',code:'W'+n,w:'',h:'',sys:'auto',brand:Q.brand||'none',cap:'',rcv:false,rmt:false,hf:'',sw:!!Q.swdef};
 }
 
 /* ================= utils ================= */
@@ -614,7 +626,7 @@ function loadQuoteToForm(){
   $('#qno').textContent=Q.no||'عرض جديد';
   ['client','attn','project','phone','date','tmode','tman','disc','terms','notes'].forEach(function(k){ var e=$('[data-q="'+k+'"]'); if(e) e.value=Q[k]===undefined?'':Q[k]; });
   $('#q-brand').innerHTML=brandOptions(Q.brand);
-  $('#q-vat').checked=!!Q.vat; $('#q-swdef').checked=!!Q.swdef; $('#q-hfdef').checked=!!Q.hfdef;
+  $('#q-vat').checked=!!Q.vat; $('#q-swdef').checked=!!Q.swdef;
   $('#loc-list').innerHTML=S.locations.map(function(l){return '<option value="'+esc(l)+'">';}).join('');
   renderOps(); recalc();
 }
@@ -623,8 +635,8 @@ $$('[data-q]').forEach(function(e){
   e.addEventListener('input',h); e.addEventListener('change',h);
 });
 $('#q-vat').onchange=function(){ Q.vat=this.checked; setDirty(true); recalc(); };
-$('#q-swdef').onchange=function(){ Q.swdef=this.checked; setDirty(true); };
-$('#q-hfdef').onchange=function(){ Q.hfdef=this.checked; setDirty(true); };
+$('#q-swdef').onchange=function(){ var v=this.checked; Q.swdef=v; Q.items.forEach(function(it){it.sw=v;}); setDirty(true); renderOps(); recalc(); };
+$('#q-brand').onchange=function(){ var v=this.value; Q.brand=v; Q.items.forEach(function(it){it.brand=v; it.cap='';}); setDirty(true); renderOps(); recalc(); toast('تم تطبيق الموتور على كل الفتحات — تقدر تغيّره في أي فتحة لوحدها'); };
 
 function renderOps(){
   var box=$('#ops');
@@ -642,11 +654,11 @@ function renderOps(){
         '</div>'+
         '<div class="grid g4">'+
           '<label class="f">السيستم<select data-k="sys">'+sysOptions(it.sys)+'</select></label>'+
+          '<label class="f">الفوم<select data-k="hf"><option value="">سوفت</option><option value="1"'+(it.hf?' selected':'')+'>هارد فوم</option></select></label>'+
           '<label class="f">نوع الموتور<select data-k="brand">'+brandOptions(it.brand||'none')+'</select></label>'+
           '<label class="f" data-m>قدرة الموتور<select data-k="cap">'+capOptions(it.cap,it.brand)+'</select></label>'+
         '</div>'+
         '<div class="row">'+
-          '<label class="chk"><input type="checkbox" data-k="hf"'+(it.hf?' checked':'')+'> هارد فوم</label>'+
           '<label class="chk"><input type="checkbox" data-k="sw"'+(it.sw?' checked':'')+'> مفتاح شنايدر</label>'+
           '<label class="chk" data-m><input type="checkbox" data-k="rcv"'+((it.rcv||it.rmt)?' checked':'')+'> '+esc(S.rcName||'ريموت + ريسيفر')+'</label>'+
         '</div>'+
@@ -941,10 +953,40 @@ function renderPreview(){
 }
 function updatePdfNote(){
   var n=$('#pdf-note'); if(!n) return;
-  if(!downloads){ n.textContent='تحميل الملفات غير متاح في هذه النافذة — افتح البرنامج من الرابط في المتصفح لتحميل PDF.'; $('#pdf-btn').disabled=true; }
-  else { n.textContent=dirty?'تنبيه: العرض فيه تعديلات غير محفوظة — سيتم حفظه تلقائياً قبل إنشاء PDF.':''; $('#pdf-btn').disabled=false; }
+  $('#pdf-btn').disabled=false;
+  $('#share-btn').style.display=canShareFiles()?'':'none';
+  var t=dirty?'تنبيه: العرض فيه تعديلات غير محفوظة — سيتم حفظه تلقائياً قبل إنشاء PDF.':'';
+  if(!downloads && window.claude) t+=(t?' ':'')+'لو زرار التحميل ما نزّلش الملف، استخدم "طباعة / حفظ PDF" واختار "حفظ كـ PDF"، أو افتح البرنامج من الرابط في المتصفح أو تطبيق Claude.';
+  n.textContent=t;
 }
-async function makePdf(){
+function canShareFiles(){
+  try{ return !!(navigator.share && navigator.canShare && navigator.canShare({files:[new File(['x'],'t.pdf',{type:'application/pdf'})]})); }catch(e){ return false; }
+}
+function pdfName(){ return ('عرض سعر '+(Q.no||'')+' '+(Q.client||'')).trim().replace(/[\\/:*?"<>|]+/g,'-')+'.pdf'; }
+async function shareBlob(blob,name){
+  var f=new File([blob],name,{type:'application/pdf'});
+  if(!canShareFiles()) return false;
+  try{ await navigator.share({files:[f],title:name}); return true; }
+  catch(e){ if(e&&e.name==='AbortError') return true; return false; }
+}
+function anchorDownload(blob,name){
+  try{ var u=URL.createObjectURL(blob), a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(u);},60000); return true; }catch(e){ return false; }
+}
+async function printQuote(){
+  if(!Q.items.length) return toast('أضف فتحات أولاً');
+  if(dirty||!Q.no) await saveQuote();
+  if(document.fonts&&document.fonts.ready) await document.fonts.ready;
+  var pa=$('#print-area'); pa.style.display='block'; pa.style.position='absolute'; pa.style.top='0'; pa.style.right='0'; pa.style.zIndex='-1';
+  buildPages(pa);
+  pa.style.cssText='';
+  var old=document.title; document.title=pdfName().replace(/\.pdf$/,'');
+  try{ window.print(); }catch(e){ toast('الطباعة غير متاحة في هذه النافذة — افتح البرنامج من الرابط في المتصفح'); }
+  setTimeout(function(){ document.title=old; },1000);
+}
+$('#print-btn').onclick=printQuote;
+$('#share-btn').onclick=function(){ makePdf('share'); };
+async function makePdf(mode){
+  if(mode!=='share') mode='save';
   if(!Q.items.length) return toast('أضف فتحات أولاً');
   if(!window.html2canvas||!window.jspdf) return toast('مكتبة PDF لم تُحمّل — تأكد من الاتصال بالإنترنت');
   if(dirty||!Q.no) await saveQuote();
@@ -962,15 +1004,20 @@ async function makePdf(){
     }
     stage.innerHTML='';
     var blob=pdf.output('blob');
-    var name=('عرض سعر '+(Q.no||'')+' '+(Q.client||'')).trim().replace(/[\\/:*?"<>|]+/g,'-')+'.pdf';
+    var name=pdfName();
     $('#busy').classList.remove('on');
-    if(!downloads){ toast('التحميل غير متاح هنا'); return; }
-    try{ await downloads.save({filename:name,data:blob}); toast('تم تجهيز الملف'); }
-    catch(e){ if(e&&e.code!=='declined') toast('تعذر التحميل ('+(e&&e.code||'')+')'); }
+    if(mode==='share'){ if(!(await shareBlob(blob,name))){ if(!anchorDownload(blob,name)) toast('المشاركة غير متاحة هنا — جرّب "طباعة / حفظ PDF"'); } return; }
+    if(downloads){
+      try{ await downloads.save({filename:name,data:blob}); toast('تم تجهيز الملف'); return; }
+      catch(e){ var c=e&&e.code; if(c==='declined') return; if(c==='rate_limited') return toast('فيه طلب تحميل مفتوح — استنى ثواني وجرّب تاني'); }
+    }
+    if(await shareBlob(blob,name)) return;
+    anchorDownload(blob,name);
+    if(window.claude) toast('لو الملف ما نزلش، استخدم زرار "طباعة / حفظ PDF"'); else toast('تم تجهيز الملف');
   }catch(e){ console.error(e); toast('حدث خطأ أثناء إنشاء PDF'); }
   finally{ $('#busy').classList.remove('on'); }
 }
-$('#pdf-btn').onclick=makePdf;
+$('#pdf-btn').onclick=function(){ makePdf('save'); };
 window.addEventListener('resize',function(){ if($('#v-preview').classList.contains('on')) renderPreview(); });
 
 /* ================= boot ================= */
@@ -984,5 +1031,3 @@ window.addEventListener('resize',function(){ if($('#v-preview').classList.contai
 </script>
 </body>
 </html>
-
-</body></html>
