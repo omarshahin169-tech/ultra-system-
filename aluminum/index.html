@@ -148,8 +148,8 @@ const DEF_ACC=[
  {id:'a23',name:'نقل',code:'',price:200,unit:'pc'},
  {id:'a24',name:'سلك',code:'',price:105,unit:'m2'},
  {id:'a25',name:'كورنر حلق فيكس',code:'',price:28.3339875,unit:'pc'},
- {id:'a26',name:'كاوتش 3 خط',code:'',price:0,unit:'m'},
- {id:'a27',name:'كاوتش زجاج 4 مم',code:'',price:0,unit:'m'}
+ {id:'a26',name:'كاوتش 3 خط',code:'',price:6,unit:'m'},
+ {id:'a27',name:'كاوتش زجاج 4 مم',code:'',price:5,unit:'m'}
 ];
 /* أطوال القطع: W عرض الشباك، H ارتفاع الجزء الجرار، HT الارتفاع الكلي، F ارتفاع الثابت */
 const LEN_OPTS={'W':'العرض','W/2':'نص العرض','W/3':'ثلث العرض','W+10':'العرض + 10 سم','H':'ارتفاع الجرار','HT+10':'الارتفاع الكلي + 10 سم','F':'ارتفاع الثابت','SAS':'السؤاس (ارتفاع الثابت أو العرض)'};
@@ -160,20 +160,20 @@ const DEF_RULES={
     R('mesh','p11','W/2',2),R('mesh','p11','H',1),R('mesh','p12','H',1),R('mesh','p13','H',1),
     R('track','p10','W',2),R('track','p10','H',2)],
  3:[R('base','p2','W',2),R('base','p2','H',2),R('base','p3','H',2),R('base','p4','W',2),R('base','p5','H',2),R('base','p6','H',2),R('base','p7','W+10',2),R('base','p7','HT+10',2),
-    R('mesh','p10','W',2),R('mesh','p11','H',4),R('mesh','p11','W/3',2)],
+    R('mesh','p10','W',2),R('mesh','p10','H',2),R('mesh','p11','H',4),R('mesh','p11','W/3',2)],
  4:[R('base','p1','W',2),R('base','p1','H',2),R('base','p3','H',2),R('base','p4','W',2),R('base','p5','H',2),R('base','p6','H',2),R('base','p7','W+10',2),R('base','p7','HT+10',2),R('base','p8','H',1),R('base','p9','H',1),
-    R('mesh','p11','W/2',4),R('mesh','p11','H',2),R('mesh','p12','H',2),R('mesh','p13','H',2),
+    R('mesh','p11','W',2),R('mesh','p11','H',2),R('mesh','p12','H',2),R('mesh','p13','H',2),
     R('track','p10','W',2),R('track','p10','H',2)],
  fix:[R('fix','p14','W',2),R('fix','p14','F',2),R('fix','p15','W',2),R('fix','p15','F',2),R('fix','p16','SAS',1)]
 };
 /* كميات الإكسسوار: n = عدد ثابت | kw,kh = متر طولي (kw×العرض + kh×الارتفاع) | kwh = متر مربع | perim = محيط حلق الفيكس */
 function A(g,a,o){return Object.assign({g,a},typeof o==='number'?{n:o}:o)}
 const DEF_ACC_RULES={
- 2:[A('base','a1',8),A('base','a2',4),A('base','a3',1),A('base','a4',2),A('base','a5',1),A('base','a6',1),A('base','a7',2),A('base','a8',{kw:3,kh:0}),A('base','a9',{kw:4,kh:8}),A('base','a10',{kw:0,kh:2}),A('base','a11',{kw:3,kh:6}),A('base','a12',4),A('base','a16',1),A('base','a17',1),A('base','a18',2),A('base','a19',1),A('base','a20',1),A('base','a23',1),
+ 2:[A('base','a1',8),A('base','a2',4),A('base','a3',1),A('base','a4',2),A('base','a5',1),A('base','a6',1),A('base','a7',2),A('base','a8',{kw:3,kh:0}),A('base','a9',{kw:4,kh:8}),A('base','a10',{kw:0,kh:2}),A('base','a11',{kw:3,kh:6}),A('base','a12',4),A('base','a16',1),A('base','a17',1),A('base','a18',2),A('base','a19',1),A('base','a20',1),A('base','a23',1),A('base','a27',{kw:4,kh:4}),
     A('mesh','a13',4),A('mesh','a14',2),A('mesh','a15',2),A('mesh','a24',{kwh:0.5})],
- 3:[A('base','a1',8),A('base','a2',6),A('base','a3',2),A('base','a4',2),A('base','a5',2),A('base','a6',2),A('base','a7',4),A('base','a8',{kw:3,kh:0}),A('base','a9',{kw:4,kh:8}),A('base','a10',{kw:0,kh:4}),A('base','a11',{kw:5,kh:10}),A('base','a12',4),A('base','a16',1),A('base','a17',1),A('base','a18',2),A('base','a19',2),A('base','a20',2),A('base','a23',1),
+ 3:[A('base','a1',8),A('base','a2',6),A('base','a3',2),A('base','a4',2),A('base','a5',2),A('base','a6',2),A('base','a7',4),A('base','a8',{kw:3,kh:0}),A('base','a9',{kw:4,kh:8}),A('base','a10',{kw:0,kh:4}),A('base','a11',{kw:5,kh:10}),A('base','a12',4),A('base','a16',1),A('base','a17',1),A('base','a18',2),A('base','a19',2),A('base','a20',2),A('base','a23',1),A('base','a27',{kw:4,kh:6}),
     A('mesh','a13',16),A('mesh','a14',4),A('mesh','a15',4),A('mesh','a24',{kwh:0.6667})],
- 4:[A('base','a1',8),A('base','a2',8),A('base','a3',3),A('base','a4',2),A('base','a5',2),A('base','a6',2),A('base','a7',4),A('base','a8',{kw:3,kh:0}),A('base','a9',{kw:4,kh:16}),A('base','a10',{kw:0,kh:8}),A('base','a11',{kw:3,kh:6}),A('base','a12',4),A('base','a16',2),A('base','a17',2),A('base','a18',4),A('base','a19',2),A('base','a20',2),A('base','a21',1),A('base','a22',1),A('base','a23',1),
+ 4:[A('base','a1',8),A('base','a2',8),A('base','a3',3),A('base','a4',2),A('base','a5',2),A('base','a6',2),A('base','a7',4),A('base','a8',{kw:3,kh:0}),A('base','a9',{kw:4,kh:16}),A('base','a10',{kw:0,kh:8}),A('base','a11',{kw:3,kh:6}),A('base','a12',4),A('base','a16',2),A('base','a17',2),A('base','a18',4),A('base','a19',2),A('base','a20',2),A('base','a21',1),A('base','a22',1),A('base','a23',1),A('base','a27',{kw:4,kh:8}),
     A('mesh','a13',8),A('mesh','a14',4),A('mesh','a15',4),A('mesh','a24',{kwh:0.5})],
  fix:[A('fix','a25',4),A('fix','a26',{perim:1}),A('fix','a27',{perim:1})]
 };
@@ -187,9 +187,22 @@ function clone(o){return JSON.parse(JSON.stringify(o))}
 function freshCatalog(){return {profiles:clone(DEF_PROFILES),acc:clone(DEF_ACC),rules:clone(DEF_RULES),accRules:clone(DEF_ACC_RULES)}}
 function load(){
   try{DB=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){DB=null}
-  if(!DB){DB={settings:clone(DEF_SETTINGS),catalog:freshCatalog(),projects:[],cur:null,seq:1}}
+  if(!DB){DB={settings:clone(DEF_SETTINGS),catalog:freshCatalog(),projects:[],cur:null,seq:1,catVer:2}}
   DB.settings=Object.assign(clone(DEF_SETTINGS),DB.settings||{});
   if(!DB.cur) DB.cur=newProject();
+  migrate();
+}
+const CAT_VER=2;
+function patchCat(c){
+  const acc=id=>c.acc.find(a=>a.id===id);
+  if(acc('a26')&&!acc('a26').price) acc('a26').price=6;
+  if(acc('a27')&&!acc('a27').price) acc('a27').price=5;
+  const r3=c.rules[3]; if(!r3.some(r=>r.g==='mesh'&&r.p==='p10'&&r.len==='H')) r3.push({g:'mesh',p:'p10',len:'H',n:2});
+  c.rules[4].forEach(r=>{if(r.g==='mesh'&&r.p==='p11'&&r.len==='W/2'&&r.n==4){r.len='W';r.n=2}});
+  [[2,4],[3,6],[4,8]].forEach(([l,kh])=>{if(!c.accRules[l].some(r=>r.g==='base'&&r.a==='a27')) c.accRules[l].push({g:'base',a:'a27',kw:4,kh})});
+}
+function migrate(){
+  if((DB.catVer||1)<CAT_VER){patchCat(DB.catalog); if(DB.cur&&DB.cur.cat) patchCat(DB.cur.cat); DB.catVer=CAT_VER; save();}
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){toast('تعذر الحفظ على هذا الجهاز')}}
 function uid(){return Math.random().toString(36).slice(2,9)}
@@ -461,7 +474,7 @@ function vSaved(){
 }
 function backup(){download('ultra14600-backup-'+today()+'.json',JSON.stringify(DB),'application/json')}
 function restore(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.catalog||!d.projects)throw 0;askConfirm('استبدال كل البيانات الحالية بالنسخة دي؟',()=>{DB=d;load2();save();render();toast('تم الاسترجاع')})}catch(e){toast('ملف غير صالح')}};r.readAsText(f)}
-function load2(){DB.settings=Object.assign(clone(DEF_SETTINGS),DB.settings||{});if(!DB.cur)DB.cur=newProject()}
+function load2(){DB.settings=Object.assign(clone(DEF_SETTINGS),DB.settings||{});if(!DB.cur)DB.cur=newProject();migrate()}
 
 /* ---- الإعدادات ---- */
 let ST='acc', SL=2;
@@ -526,7 +539,7 @@ function addAcc(){const n=$('#na_n').value.trim();if(!n)return toast('اكتب �
 function addAccRule(){const a=$('#ar_a').value,acc=DB.catalog.acc.find(x=>x.id===a),v=+$('#ar_n').value||0,g=$('#ar_g').value;
   const r={g,a}; if(acc.unit==='pc') r.n=v; else if(acc.unit==='m2') r.kwh=v; else {r.kw=v;r.kh=0}
   DB.catalog.accRules[SL].push(r);save();render();toast('تمت الإضافة')}
-function resetCat(){askConfirm('استرجاع كل القطاعات والأسعار والكميات للقيم الأصلية؟',()=>{DB.catalog=freshCatalog();save();render();toast('تم الاسترجاع')})}
+function resetCat(){askConfirm('استرجاع كل القطاعات والأسعار والكميات للقيم الأصلية؟',()=>{DB.catalog=freshCatalog();DB.catVer=CAT_VER;save();render();toast('تم الاسترجاع')})}
 
 load(); render();
 </script>
