@@ -418,7 +418,9 @@ function pickMotor(b,need){
 }
 function brandName(S,id){ var b=S.brands.find(function(x){return x.id===id;}); return b?b.name:''; }
 function calcItem(it,Q,S){
-  var w=num(it.w), h=num(it.h), warn=[];
+  var cm=!!(Q&&Q.unit==='cm'), k=cm?0.01:1, warn=[];
+  var w=r3(num(it.w)*k), h=r3(num(it.h)*k);
+  if(cm && ((num(it.w)>0 && num(it.w)<20) || (num(it.h)>0 && num(it.h)<20))) warn.push('المقاسات بالسنتيمتر — '+num(it.w)+' × '+num(it.h)+' سم صغيرة جداً، اتأكد إنك مش كاتبها بالمتر (مثلاً 2 متر = 200)');
   var realArea=w*h, minA=num(S.minArea);
   var billRaw=(realArea>0 && realArea<minA)?minA:realArea;
   var area=r3(billRaw);
@@ -543,7 +545,7 @@ var LS_S='ultra_settings_v1', LS_Q='ultra_quotes_v1';
 
 function newQuote(){
   return {id:uid(),no:'',client:'',attn:'',project:'',phone:'',date:today(),brand:'none',
-    swdef:true,items:[],tmode:'cairo',tman:'',disc:0,vat:false,terms:S.terms.join('\n'),notes:'',created:Date.now(),updated:Date.now()};
+    unit:'cm',swdef:true,items:[],tmode:'cairo',tman:'',disc:0,vat:false,terms:S.terms.join('\n'),notes:'',created:Date.now(),updated:Date.now()};
 }
 function nextNo(){
   var y=new Date().getFullYear(), mx=0;
@@ -663,7 +665,13 @@ function brandOptions(sel){
 function sysOptions(sel){ var o='<option value="auto">تلقائي</option>'; S.systems.forEach(function(s){ o+='<option value="'+esc(s.id)+'"'+(sel===s.id?' selected':'')+'>'+esc(s.name)+'</option>'; }); return o; }
 function capOptions(sel,brand){ var B=S.brands.find(function(x){return x.id===brand;}); var o='<option value="">تلقائي</option>'; ((B&&B.table)||[]).filter(function(r){return num(r.price)>0;}).map(function(r){return num(r.cap);}).sort(function(a,b){return a-b;}).forEach(function(c){ o+='<option value="'+c+'"'+(String(sel)===String(c)?' selected':'')+'>'+c+' ن.م</option>'; }); return o; }
 
+function toCm(Q){
+  if(Q.unit==='cm') return;
+  Q.items.forEach(function(it){ ['w','h'].forEach(function(k){ if(it[k]!==''&&it[k]!=null) it[k]=String(Math.round(num(it[k])*1000)/10); }); });
+  Q.unit='cm';
+}
 function loadQuoteToForm(){
+  toCm(Q);
   $('#qno').textContent=Q.no||'عرض جديد';
   ['client','attn','project','phone','date','tmode','tman','disc','terms','notes'].forEach(function(k){ var e=$('[data-q="'+k+'"]'); if(e) e.value=Q[k]===undefined?'':Q[k]; });
   $('#q-brand').innerHTML=brandOptions(Q.brand);
@@ -690,8 +698,8 @@ function renderOps(){
         '<div class="grid g4">'+
           '<label class="f">المكان<input data-k="loc" list="loc-list" value="'+esc(it.loc)+'"></label>'+
           '<label class="f">الكود<input data-k="code" value="'+esc(it.code)+'"></label>'+
-          '<label class="f">العرض (م)<input data-k="w" type="number" inputmode="decimal" step="0.01" min="0" value="'+esc(it.w)+'"></label>'+
-          '<label class="f">الارتفاع (م)<input data-k="h" type="number" inputmode="decimal" step="0.01" min="0" value="'+esc(it.h)+'"></label>'+
+          '<label class="f">العرض (سم)<input data-k="w" type="number" inputmode="decimal" step="1" min="0" placeholder="مثال: 200" value="'+esc(it.w)+'"></label>'+
+          '<label class="f">الارتفاع (سم)<input data-k="h" type="number" inputmode="decimal" step="1" min="0" placeholder="مثال: 250" value="'+esc(it.h)+'"></label>'+
         '</div>'+
         '<div class="grid g4">'+
           '<label class="f">السيستم<select data-k="sys">'+sysOptions(it.sys)+'</select></label>'+
