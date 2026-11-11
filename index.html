@@ -115,11 +115,12 @@ table.sum tr.neg td:last-child{color:#b42318}
 .qcl{display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;font-size:12.5px;background:#f7f7f5;border:1px solid #e2e2de;border-radius:8px;padding:8px 12px;margin-bottom:8px}
 .qcl b{color:var(--navy)}
 .qintro{font-size:12.5px;margin:4px 0 8px;font-weight:600}
-table.qt{width:100%;border-collapse:collapse;font-size:10.5px;table-layout:fixed}
-table.qt th{background:var(--accent);color:var(--ink);font-weight:800;padding:5px 2px;border:1px solid #c9a33a;line-height:1.25}
-table.qt td{border:1px solid #d4d4cf;padding:4px 2px;text-align:center;line-height:1.3}
+table.qt{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed}
+table.qt th{background:var(--accent);color:var(--ink);font-weight:800;font-size:10.5px;padding:6px 2px;border:1px solid #c9a33a;line-height:1.25}
+table.qt td{border:1px solid #d4d4cf;padding:5px 2px;text-align:center;line-height:1.3;vertical-align:middle}
 table.qt tbody tr:nth-child(even) td{background:#f6f6f4}
 table.qt td.n{direction:ltr}
+table.qt td.sy{white-space:nowrap;font-size:10.5px;font-weight:700}
 .qsec{margin-top:12px}
 .qsec h4{margin:0 0 5px;font-size:13.5px;color:#fff;background:var(--navy);border-right:4px solid var(--accent);display:inline-block;padding:1px 12px;border-radius:5px}
 .qsec ul{margin:0;padding-inline-start:20px;font-size:12px;line-height:1.75}
@@ -500,7 +501,7 @@ function defaultBrands(){ return [
   {id:'somfy',name:'Somfy',spec:'',accessory:250,table:T_([[10,5300],[15,5500],[20,5800],[30,7806],[40,9709],[50,10750],[60,12430],[80,14608],[100,15939],[120,19562]])},
   {id:'somfy_io',name:'Somfy IO',spec:'',accessory:250,table:T_([[6,9064],[10,9688],[20,10543],[30,11382],[40,12200],[55,15993],[70,17275],[85,18965],[100,20032],[120,24006]])}
 ]; }
-var SYS_SPECS={"sh5": {"t": "شرائح الألومنيوم 5 سم (Aluminum 50 mm)", "s": "شرائح مشكلة من خامات الألومنيوم المخصصة لأنظمة شيش الحصيرة.\nسمك الألومنيوم: 0.25 مم.\nالشرائح محقونة بفوم البولي يوريثان العازل للحرارة والصوت.\nدهانات بنظام Coil Coating معالجة لمقاومة العوامل الجوية، مع عمر افتراضي مستهدف يتجاوز 10 سنوات وفقاً لظروف الاستخدام والصيانة.\nتخريم مخصص للإضاءة (حسب التصميم).\nتصميم هندسي يضمن انسيابية الحركة وسلاسة الفتح والغلق."}, "brox": {"t": "شرائح بروكس (PROX 55 mm)", "s": "شرائح ألومنيوم مشكلة.\nارتفاع الشريحة: 55 مم.\nسمك الألومنيوم: 0.25 مم.\nحقن فوم عازل للحرارة والصوت.\nدهانات Coil Coating معالجة.\nتصميم يضمن انسيابية الحركة وسلاسة التشغيل."}, "ultra": {"t": "شرائح ألترا (ULTRA)", "s": "شرائح ألومنيوم مشكلة ومصممة لأنظمة شيش الحصيرة.\nسمك الألومنيوم: 0.30 مم.\nسمك الفوم: 1.2 سم.\nحقن فوم عازل للحرارة والصوت.\nتصميم يوفر صلابة ومتانة أعلى للشريحة.\nحركة انسيابية وسلاسة في الفتح والغلق."}, "shield": {"t": "شرائح شيلد (SHIELD)", "s": "شرائح مصنعة من الألومنيوم المسحوب (Extruded Aluminum).\nسمك الألومنيوم: 1 مم.\nمصنعة من سبيكة ألومنيوم 6063.\nدهانات بنظام Electrostatic Powder Coating.\nمقاومة عالية للعوامل الجوية، ومناسبة للاستخدام في المناطق الساحلية.\nأول شريحة ألومنيوم مسحوبة ومحقونة بالفوم ضمن هذا النظام.\nمصممة لتوفير مستوى إضافي من الأمان والحماية.\nمناسبة للاستخدام في الأدوار الأرضية والفتحات التي تتطلب حماية إضافية.\nتصميم أمان (Safety Shutter) يجمع بين المتانة والحماية."}, "aero": {"t": "شرائح إيرو (AERO 55 mm)", "s": "شريحة ألومنيوم بارتفاع 55 مم.\nمصنعة من الألومنيوم.\nغير محقونة بالفوم.\nتصميم مخصص لتوفير حركة سلسة وانسيابية أثناء التشغيل."}};
+var SYS_SPECS={"sh5": {"t": "شرائح الألومنيوم 5 سم (Aluminum 50 mm)", "s": "شرائح من خامات الألومنيوم المخصصة لأنظمة شيش الحصيرة.\nسمك الألومنيوم: 0.25 مم.\nالشرائح محقونة بفوم البولي يوريثان العازل للحرارة والصوت.\nدهانات بنظام Coil Coating معالجة لمقاومة العوامل الجوية، مع عمر افتراضي مستهدف يتجاوز 10 سنوات وفقاً لظروف الاستخدام والصيانة.\nتخريم مخصص للإضاءة (حسب التصميم).\nتصميم هندسي يضمن انسيابية الحركة وسلاسة الفتح والغلق."}, "brox": {"t": "شرائح بروكس (PROX 55 mm)", "s": "شرائح ألومنيوم.\nارتفاع الشريحة: 55 مم.\nسمك الألومنيوم: 0.25 مم.\nحقن فوم عازل للحرارة والصوت.\nدهانات Coil Coating معالجة.\nتصميم يضمن انسيابية الحركة وسلاسة التشغيل."}, "ultra": {"t": "شرائح ألترا (ULTRA)", "s": "شرائح ألومنيوم مصممة لأنظمة شيش الحصيرة.\nسمك الألومنيوم: 0.30 مم.\nسمك الفوم: 1.2 سم.\nحقن فوم عازل للحرارة والصوت.\nتصميم يوفر صلابة ومتانة أعلى للشريحة.\nحركة انسيابية وسلاسة في الفتح والغلق."}, "shield": {"t": "شرائح شيلد (SHIELD)", "s": "شرائح مصنعة من الألومنيوم المسحوب (Extruded Aluminum).\nسمك الألومنيوم: 1 مم.\nمصنعة من سبيكة ألومنيوم 6063.\nدهانات بنظام Electrostatic Powder Coating.\nمقاومة عالية للعوامل الجوية، ومناسبة للاستخدام في المناطق الساحلية.\nأول شريحة ألومنيوم مسحوبة ومحقونة بالفوم ضمن هذا النظام.\nمصممة لتوفير مستوى إضافي من الأمان والحماية.\nمناسبة للاستخدام في الأدوار الأرضية والفتحات التي تتطلب حماية إضافية.\nتصميم أمان (Safety Shutter) يجمع بين المتانة والحماية."}, "aero": {"t": "شرائح إيرو (AERO 55 mm)", "s": "شريحة ألومنيوم بارتفاع 55 مم.\nمصنعة من الألومنيوم.\nغير محقونة بالفوم.\nتصميم مخصص لتوفير حركة سلسة وانسيابية أثناء التشغيل."}};
 var BOX_SPECS=["علبة شيش مصنعة من خامة الألومنيوم.", "سمك الألومنيوم: 1 مم.", "تصميم مناسب لاستيعاب الشريحة ومكونات نظام التشغيل.", "★ العلبة مزودة بفرش داخلي (Integrated Brush System).", "★ الفرش الداخلي يساعد على حماية الجزء الداخلي للبوكس من الأتربة والحشرات، ويحد من دخولها إلى داخل العلبة.", "يساعد التصميم أيضاً على تقليل تراكم الأتربة والمساهمة في الحفاظ على نظافة الشيش ومكوناته الداخلية."];
 function defaultSystems(){ return [
   {id:'brox',name:'بروكس 5.5 سم',label:'SH بروكس 5.5 سم',auto:true,min:0,max:3.5,kg:3,price:2800,hardPrice:3100,hardKg:'',spec:'شيش SH بروكس 5.5 سم محقون فوم عازل للصوت والضوء والحرارة.'},
@@ -512,7 +513,7 @@ function defaultSystems(){ return [
 function withSpecs(list){ list.forEach(function(x){ var d=SYS_SPECS[x.id]; if(d){ x.specTitle=d.t; x.spec=d.s; } }); return list; }
 function defaultSettings(){
   return {
-    v:5,
+    v:6,
     company:{name:'ULTRA SYSTEM',tagline:'ROLLER SHUTTER SYSTEMS',address:'OFFICE : the 1 settlement – El Yasmeen 1 – Ahmed Shawky street – Villa 11',phones:'002-01050500980 - 01041527243',intro:'تتشرف الشركة بتقديم عرضها لسيادتكم للشيش الحصيرة طبقاً للبيان التالي:',logo:DEFAULT_LOGO},
     basis:'width',
     systems:withSpecs(defaultSystems()),
@@ -598,6 +599,10 @@ function mergeSettings(saved){
     s.boxTitle=defaultSettings().boxTitle; s.boxSpecs=BOX_SPECS.slice();
     s.generalSpecs=(s.generalSpecs||[]).filter(function(l){ return l.indexOf('فرش')<0; });
     s.terms=defaultSettings().terms.slice(); s.v=5;
+  }
+  if(!(saved.v>=6)){ // شيل كلمة "مشكلة" من المواصفات
+    s.systems.forEach(function(x){ if(x.spec) x.spec=String(x.spec).replace(/ مشكلة ومصممة/g,' مصممة').replace(/شرائح مشكلة من/g,'شرائح من').replace(/\s*مشكلة/g,''); });
+    s.v=6;
   }
   if(!Array.isArray(s.boxSpecs)) s.boxSpecs=[];
   if(!s.rcName) s.rcName=defaultSettings().rcName;
@@ -919,13 +924,13 @@ function headerHTML(C){
     (Q.attn?'<div>عناية: <b>'+esc(Q.attn)+'</b></div>':'')+(Q.phone?'<div>تليفون: <b>'+esc(Q.phone)+'</b></div>':'')+'</div>'+
     (c.intro?'<div class="qintro">'+esc(c.intro)+'</div>':'');
 }
-var COLS='<colgroup><col style="width:20px"><col style="width:56px"><col style="width:30px"><col style="width:70px"><col style="width:34px"><col style="width:36px"><col style="width:44px"><col style="width:38px"><col style="width:52px"><col style="width:76px"><col style="width:44px"><col style="width:44px"><col style="width:34px"><col style="width:56px"></colgroup>';
+var COLS='<colgroup><col style="width:20px"><col style="width:50px"><col style="width:28px"><col style="width:86px"><col style="width:34px"><col style="width:36px"><col style="width:44px"><col style="width:38px"><col style="width:52px"><col style="width:68px"><col style="width:44px"><col style="width:44px"><col style="width:34px"><col style="width:56px"></colgroup>';
 function tableHead(){ return COLS+'<thead><tr><th>م</th><th>المكان</th><th>الكود</th><th>السيستم</th><th>العرض<br>م</th><th>الارتفاع<br>م</th><th>المساحة<br>م²</th><th>سعر<br>المتر</th><th>سعر<br>الشيش</th><th>الموتور</th><th>سعر<br>الموتور</th><th>ريموت +<br>ريسيفر</th><th>مفتاح</th><th>الإجمالي</th></tr></thead>'; }
 function rowHTML(r,it,i){
   var m=r.motor, mt=m.brand==='none'?'—':m.osaire?esc(m.name):esc(m.name)+(m.cap?' '+m.cap+'N':'');
   var mp=m.price+m.acc; // إكسسوارات الموتور (Somfy) مدمجة في سعر الموتور للعميل
   var exv=m.rcv+m.rmt;
-  return '<tr><td>'+(i+1)+'</td><td>'+esc(it.loc)+'</td><td>'+esc(it.code)+'</td><td>'+esc(r.sys?(r.sys.label||r.sys.name):'—')+(r.hf?'<br><span style="font-size:8.5px;color:#556">هارد فوم</span>':'')+'</td>'+
+  return '<tr><td>'+(i+1)+'</td><td>'+esc(it.loc)+'</td><td>'+esc(it.code)+'</td><td class="sy">'+esc(r.sys?(r.sys.label||r.sys.name):'—')+(r.hf?'<br><span style="font-size:8.5px;color:#556">هارد فوم</span>':'')+'</td>'+
     '<td class="n">'+f2(r.w)+'</td><td class="n">'+f2(r.h)+'</td><td class="n">'+f3(r.area)+'</td><td class="n">'+fm(r.ppm)+'</td><td class="n">'+fm(r.shutter)+'</td>'+
     '<td>'+mt+'</td><td class="n">'+(mp?fm(mp):'—')+'</td><td class="n">'+(exv?fm(exv):'—')+'</td><td class="n">'+(r.sw?fm(r.sw):'—')+'</td><td class="n"><b>'+fm(r.total)+'</b></td></tr>';
 }
@@ -991,8 +996,8 @@ function buildPages(target){
       var t2=document.createElement('table'); t2.className='qt'; t2.innerHTML=tableHead()+'<tbody></tbody>'; content.appendChild(t2); tbody=t2.querySelector('tbody'); tbody.appendChild(tr); }
   });
   tbody=null;
-  sysSpecBlocks(C).forEach(addBlock);
   addBlock(totalsHTML(C));
+  sysSpecBlocks(C).forEach(addBlock);
   var sp=specsHTML(C); if(sp) addBlock(sp);
   var tm=termsHTML(); if(tm) addBlock(tm);
   pages.forEach(function(p,i){ p.querySelector('.pg').textContent='Page '+(i+1)+' / '+pages.length; });
