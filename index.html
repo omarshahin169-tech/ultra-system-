@@ -510,12 +510,13 @@ function defaultSystems(){ return [
   {id:'ultra',name:'ألترا 5.5 سم',label:'ألترا 5.5 سم',auto:true,min:3.5,max:4.5,kg:4,price:3600,hardPrice:3900,hardKg:'',spec:''},
   {id:'sh5',name:'SH 5 سم',label:'SH 5 سم',auto:false,min:0,max:4,kg:2.2,price:2800,hardPrice:3100,hardKg:2.6,spec:''},
   {id:'shield',name:'شيلد 5.5 سم',label:'شيلد 5.5 سم',auto:false,min:0,max:5,kg:8,price:6500,hardPrice:6800,hardKg:'',spec:''},
-  {id:'aero',name:'ايرو 5.5 سم',label:'ايرو 5.5 سم',auto:false,min:0,max:5,kg:7,price:7000,hardPrice:7300,hardKg:'',spec:''}
+  {id:'aero',name:'ايرو 5.5 سم',label:'ايرو 5.5 سم',auto:false,min:0,max:5,kg:7,price:7000,hardPrice:7300,hardKg:'',spec:''},
+  {id:'zinc',name:'زنكاليوم إيطالي',label:'زنكاليوم إيطالي',auto:false,min:0,max:5,kg:10,price:4800,hardPrice:'',hardKg:'',specTitle:'شرائح زنكاليوم إيطالي (Italian Zincalume)',spec:''}
 ]; }
 function withSpecs(list){ list.forEach(function(x){ var d=SYS_SPECS[x.id]; if(d){ x.specTitle=d.t; x.spec=d.s; } }); return list; }
 function defaultSettings(){
   return {
-    v:6,
+    v:7,
     company:{name:'ULTRA SYSTEM',tagline:'ROLLER SHUTTER SYSTEMS',address:'OFFICE : the 1 settlement – El Yasmeen 1 – Ahmed Shawky street – Villa 11',phones:'002-01050500980 - 01041527243',intro:'تتشرف الشركة بتقديم عرضها لسيادتكم للشيش الحصيرة طبقاً للبيان التالي:',logo:DEFAULT_LOGO},
     basis:'width',
     systems:withSpecs(defaultSystems()),
@@ -605,6 +606,10 @@ function mergeSettings(saved){
   if(!(saved.v>=6)){ // شيل كلمة "مشكلة" من المواصفات
     s.systems.forEach(function(x){ if(x.spec) x.spec=String(x.spec).replace(/ مشكلة ومصممة/g,' مصممة').replace(/شرائح مشكلة من/g,'شرائح من').replace(/\s*مشكلة/g,''); });
     s.v=6;
+  }
+  if(!(saved.v>=7)){ // إضافة شريحة زنكاليوم إيطالي
+    if(!s.systems.some(function(x){return x.id==='zinc';})){ var z=defaultSystems().filter(function(x){return x.id==='zinc';})[0]; s.systems.push(z); }
+    s.v=7;
   }
   if(!Array.isArray(s.boxSpecs)) s.boxSpecs=[];
   if(!s.rcName) s.rcName=defaultSettings().rcName;
