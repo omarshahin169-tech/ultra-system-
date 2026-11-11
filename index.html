@@ -917,9 +917,10 @@ $('#bk-exp').onclick=async function(){
   try{ await downloads.save({filename:'ultra-system-backup-'+today()+'.json',data:data}); }catch(e){ if(e&&e.code!=='declined') toast('تعذر التحميل'); }
 };
 $('#bk-imp').onchange=function(){ var f=this.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=async function(){
-  try{ var d=JSON.parse(rd.result); if(!d.settings) throw 0;
-    if(!(await confirmBox('استيراد النسخة سيستبدل الإعدادات ويضيف '+Object.keys(d.quotes||{}).length+' عرض. تكمل؟'))) return;
-    S=mergeSettings(d.settings); await persistSettings();
+  try{ var d=JSON.parse(rd.result); if(!d.settings && !d.quotes) throw 0;
+    var nq=Object.keys(d.quotes||{}).length;
+    if(!(await confirmBox(d.settings?('استيراد النسخة سيستبدل الإعدادات ويضيف '+nq+' عرض. تكمل؟'):('هيتضاف '+nq+' عرض للعروض المحفوظة (الإعدادات مش هتتغير). تكمل؟')))) return;
+    if(d.settings){ S=mergeSettings(d.settings); await persistSettings(); }
     var qs=Object.values(d.quotes||{}); for(var i=0;i<qs.length;i++){ QUOTES[qs[i].id]=qs[i]; await persistQuote(qs[i]); }
     renderSettings(); loadQuoteToForm(); toast('تم الاستيراد');
   }catch(e){ toast('الملف غير صالح'); } }; rd.readAsText(f); this.value=''; };
