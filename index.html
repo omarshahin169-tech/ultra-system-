@@ -38,7 +38,8 @@ main{max-width:1200px;margin:0 auto;padding:16px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media(max-width:760px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:760px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g5{grid-template-columns:repeat(2,minmax(0,1fr))}.g5 .qf{grid-column:1/-1}}
 @media(max-width:420px){.g2.sm1{grid-template-columns:1fr}}
 label.f{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--muted);font-weight:600;min-width:0}
 label.f input,label.f select,label.f textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;font-size:15px;color:var(--text);width:100%;min-width:0}
@@ -468,15 +469,16 @@ function calcItem(it,Q,S){
   motor.total=motor.price+motor.acc+motor.rcv+motor.rmt;
   var shutter=Math.round(billRaw*ppm);
   var sw=it.sw?num(S.switchPrice):0;
-  return {w:w,h:h,area:area,realArea:r3(realArea),minApplied:billRaw!==realArea,sys:sys,hf:hf,span:sp,ppm:ppm,weight:weight,motor:motor,shutter:shutter,sw:sw,total:shutter+motor.total+sw,warn:warn};
+  return {w:w,h:h,area:area,realArea:r3(realArea),minApplied:billRaw!==realArea,sys:sys,hf:hf,span:sp,ppm:ppm,weight:weight,motor:motor,shutter:shutter,sw:sw,total:shutter+motor.total+sw,qty:qtyOf(it),line:(shutter+motor.total+sw)*qtyOf(it),warn:warn};
 }
+function qtyOf(it){ var n=Math.floor(num(it.qty)); return n>=1?n:1; }
 function calcQuote(Q,S){
   var rows=Q.items.map(function(it){return calcItem(it,Q,S);});
-  var T={count:rows.length,area:0,weight:0,shutters:0,motors:0,motorCount:0,acc:0,accCount:0,rcv:0,rcvCount:0,rmt:0,rmtCount:0,switches:0,switchCount:0};
-  rows.forEach(function(r){ var m=r.motor; T.area+=r.area; T.weight+=r.weight; T.shutters+=r.shutter;
-    T.motors+=m.price; if(m.price>0||m.osaire||m.cap>0)T.motorCount++; T.acc+=m.acc; if(m.acc>0)T.accCount++;
-    T.rcv+=m.rcv; if(m.rcv>0)T.rcvCount++; T.rmt+=m.rmt; if(m.rmt>0)T.rmtCount++;
-    T.switches+=r.sw; if(r.sw>0)T.switchCount++; });
+  var T={count:0,lines:rows.length,area:0,weight:0,shutters:0,motors:0,motorCount:0,acc:0,accCount:0,rcv:0,rcvCount:0,rmt:0,rmtCount:0,switches:0,switchCount:0};
+  rows.forEach(function(r){ var m=r.motor, n=r.qty; T.count+=n; T.area+=r.area*n; T.weight+=r.weight*n; T.shutters+=r.shutter*n;
+    T.motors+=m.price*n; if(m.price>0||m.osaire||m.cap>0)T.motorCount+=n; T.acc+=m.acc*n; if(m.acc>0)T.accCount+=n;
+    T.rcv+=m.rcv*n; if(m.rcv>0)T.rcvCount+=n; T.rmt+=m.rmt*n; if(m.rmt>0)T.rmtCount+=n;
+    T.switches+=r.sw*n; if(r.sw>0)T.switchCount+=n; });
   T.motorAll=T.motors+T.acc+T.rcv+T.rmt;
   T.area=r3(T.area); T.weight=r2(T.weight);
   T.subtotal=T.shutters+T.motorAll+T.switches;
@@ -556,8 +558,8 @@ function nextNo(){
 function newItem(){
   var n=Q.items.length+1;
   var L=Q.items[Q.items.length-1];
-  if(L) return {loc:'',code:'W'+n,w:'',h:'',sys:L.sys||'auto',brand:L.brand||'none',cap:'',rcv:!!(L.rcv||L.rmt),rmt:false,hf:L.hf?'1':'',sw:!!L.sw};
-  return {loc:'',code:'W'+n,w:'',h:'',sys:'auto',brand:Q.brand||'none',cap:'',rcv:false,rmt:false,hf:'',sw:!!Q.swdef};
+  if(L) return {qty:'1',loc:'',code:'W'+n,w:'',h:'',sys:L.sys||'auto',brand:L.brand||'none',cap:'',rcv:!!(L.rcv||L.rmt),rmt:false,hf:L.hf?'1':'',sw:!!L.sw};
+  return {qty:'1',loc:'',code:'W'+n,w:'',h:'',sys:'auto',brand:Q.brand||'none',cap:'',rcv:false,rmt:false,hf:'',sw:!!Q.swdef};
 }
 
 /* ================= utils ================= */
@@ -698,14 +700,15 @@ function renderOps(){
   if(!Q.items.length){ box.innerHTML='<div class="empty">لا توجد فتحات بعد — اضغط "إضافة فتحة"</div>'; $('#opcount').textContent='0'; return; }
   box.innerHTML=Q.items.map(function(it,i){
     return '<div class="op" data-i="'+i+'">'+
-      '<div class="op-h"><span class="op-n">'+(i+1)+'</span><b class="sp" data-t="title">'+esc(it.code||'')+(it.loc?' — '+esc(it.loc):'')+'</b>'+
+      '<div class="op-h"><span class="op-n">'+(i+1)+'</span><b class="sp" data-t="title">'+esc(it.code||'')+(it.loc?' — '+esc(it.loc):'')+(qtyOf(it)>1?' × '+qtyOf(it):'')+'</b>'+
       '<button class="btn sm" data-a="up" title="لأعلى">▲</button><button class="btn sm" data-a="dup">نسخ</button><button class="btn sm danger" data-a="del">حذف</button></div>'+
       '<div class="op-b">'+
-        '<div class="grid g4">'+
+        '<div class="grid g5">'+
           '<label class="f">المكان<input data-k="loc" list="loc-list" value="'+esc(it.loc)+'"></label>'+
           '<label class="f">الكود<input data-k="code" value="'+esc(it.code)+'"></label>'+
           '<label class="f">العرض (سم)<input data-k="w" type="number" inputmode="decimal" step="1" min="0" placeholder="مثال: 200" value="'+esc(it.w)+'"></label>'+
           '<label class="f">الارتفاع (سم)<input data-k="h" type="number" inputmode="decimal" step="1" min="0" placeholder="مثال: 250" value="'+esc(it.h)+'"></label>'+
+          '<label class="f qf">العدد<input data-k="qty" type="number" inputmode="numeric" step="1" min="1" value="'+esc(it.qty||1)+'"></label>'+
         '</div>'+
         '<div class="grid g4">'+
           '<label class="f">السيستم<select data-k="sys">'+sysOptions(it.sys)+'</select></label>'+
@@ -746,7 +749,7 @@ function renderOpsResults(){
       (m.rcv?kv('ريموت + ريسيفر',fm(m.rcv)):'')+
       (m.brand!=='none'?'<div class="kv"><small>إجمالي الموتور والإضافات</small><b style="color:var(--navy2)">'+fm(m.total)+'</b></div>':'')+
       kv('المفتاح',fm(r.sw))+
-      '<div class="kv tot"><small>إجمالي الفتحة</small><b>'+fm(r.total)+'</b></div>'+
+      (r.qty>1?'<div class="kv"><small>سعر الفتحة الواحدة</small><b>'+fm(r.total)+'</b></div><div class="kv tot"><small>الإجمالي × '+r.qty+'</small><b>'+fm(r.line)+'</b></div>':'<div class="kv tot"><small>إجمالي الفتحة</small><b>'+fm(r.total)+'</b></div>')+
       (r.warn.length?'<div class="warns">'+r.warn.map(function(w){return '<div class="warn">⚠ '+esc(w)+'</div>';}).join('')+'</div>':'');
   });
 }
@@ -758,7 +761,7 @@ function onOpInput(e){
   it[k]= t.type==='checkbox'? t.checked : t.value;
   if(k==='rcv') it.rmt=false;
   if(k==='brand'){ it.cap=''; var ci=el.querySelector('[data-k=cap]'); ci.innerHTML=capOptions('',it.brand); }
-  if(k==='loc'||k==='code') el.querySelector('[data-t="title"]').textContent=(it.code||'')+(it.loc?' — '+it.loc:'');
+  if(k==='loc'||k==='code'||k==='qty') el.querySelector('[data-t="title"]').textContent=(it.code||'')+(it.loc?' — '+it.loc:'')+(qtyOf(it)>1?' × '+qtyOf(it):'');
   setDirty(true); renderOpsResults(); recalc();
 }
 $('#ops').addEventListener('click',async function(e){
@@ -778,7 +781,7 @@ function recalc(){
   $('#tman-wrap').style.display=Q.tmode==='manual'?'':'none';
   $('#vatlbl').textContent='('+T.vatRate+'%)';
   var rows=[
-    ['عدد الفتحات',T.count],
+    ['عدد الفتحات',T.count+(T.lines!==T.count?' <small class="muted">('+T.lines+' مقاس)</small>':'')],
     ['إجمالي المساحات',U(f3(T.area),'م²')],
     ['إجمالي وزن الشيش',U(f2(T.weight),'كجم')],
     ['إجمالي سعر الشيش',fm(T.shutters)],
@@ -826,7 +829,7 @@ function renderSaved(){
   $('#qlist').innerHTML=list.map(function(x){
     var T=calcQuote(x,S).T;
     return '<div class="qi" data-id="'+esc(x.id)+'"><div class="t"><b>'+esc(x.client||'بدون اسم')+(x.project?' — '+esc(x.project):'')+'</b>'+
-      '<span class="muted">'+esc(x.no)+' · '+esc(x.date)+' · '+x.items.length+' فتحة</span></div>'+
+      '<span class="muted">'+esc(x.no)+' · '+esc(x.date)+' · '+T.count+' فتحة</span></div>'+
       '<span class="amt">'+U(fm(T.grand),'ج.م')+'</span>'+
       '<button class="btn sm pri" data-a="open">فتح</button><button class="btn sm" data-a="copy">نسخ</button><button class="btn sm danger" data-a="del">حذف</button></div>';
   }).join('');
@@ -939,15 +942,15 @@ function headerHTML(C){
     (Q.attn?'<div>عناية: <b>'+esc(Q.attn)+'</b></div>':'')+(Q.phone?'<div>تليفون: <b>'+esc(Q.phone)+'</b></div>':'')+'</div>'+
     (c.intro?'<div class="qintro">'+esc(c.intro)+'</div>':'');
 }
-var COLS='<colgroup><col style="width:20px"><col style="width:50px"><col style="width:28px"><col style="width:86px"><col style="width:34px"><col style="width:36px"><col style="width:44px"><col style="width:38px"><col style="width:52px"><col style="width:68px"><col style="width:44px"><col style="width:44px"><col style="width:34px"><col style="width:56px"></colgroup>';
-function tableHead(){ return COLS+'<thead><tr><th>م</th><th>المكان</th><th>الكود</th><th>السيستم</th><th>العرض<br>م</th><th>الارتفاع<br>م</th><th>المساحة<br>م²</th><th>سعر<br>المتر</th><th>سعر<br>الشيش</th><th>الموتور</th><th>سعر<br>الموتور</th><th>ريموت +<br>ريسيفر</th><th>مفتاح</th><th>الإجمالي</th></tr></thead>'; }
+var COLS='<colgroup><col style="width:20px"><col style="width:50px"><col style="width:28px"><col style="width:86px"><col style="width:34px"><col style="width:36px"><col style="width:44px"><col style="width:38px"><col style="width:50px"><col style="width:62px"><col style="width:44px"><col style="width:44px"><col style="width:32px"><col style="width:28px"><col style="width:58px"></colgroup>';
+function tableHead(){ return COLS+'<thead><tr><th>م</th><th>المكان</th><th>الكود</th><th>السيستم</th><th>العرض<br>م</th><th>الارتفاع<br>م</th><th>المساحة<br>م²</th><th>سعر<br>المتر</th><th>سعر<br>الشيش</th><th>الموتور</th><th>سعر<br>الموتور</th><th>ريموت +<br>ريسيفر</th><th>مفتاح</th><th>العدد</th><th>الإجمالي</th></tr></thead>'; }
 function rowHTML(r,it,i){
   var m=r.motor, mt=m.brand==='none'?'—':m.osaire?esc(m.name):esc(m.name)+(m.cap?' '+m.cap+'N':'');
   var mp=m.price+m.acc; // إكسسوارات الموتور (Somfy) مدمجة في سعر الموتور للعميل
   var exv=m.rcv+m.rmt;
   return '<tr><td>'+(i+1)+'</td><td>'+esc(it.loc)+'</td><td>'+esc(it.code)+'</td><td class="sy">'+esc(r.sys?(r.sys.label||r.sys.name):'—')+(r.hf?'<br><span style="font-size:8.5px;color:#556">هارد فوم</span>':'')+'</td>'+
     '<td class="n">'+f2(r.w)+'</td><td class="n">'+f2(r.h)+'</td><td class="n">'+f3(r.area)+'</td><td class="n">'+fm(r.ppm)+'</td><td class="n">'+fm(r.shutter)+'</td>'+
-    '<td>'+mt+'</td><td class="n">'+(mp?fm(mp):'—')+'</td><td class="n">'+(exv?fm(exv):'—')+'</td><td class="n">'+(r.sw?fm(r.sw):'—')+'</td><td class="n"><b>'+fm(r.total)+'</b></td></tr>';
+    '<td>'+mt+'</td><td class="n">'+(mp?fm(mp):'—')+'</td><td class="n">'+(exv?fm(exv):'—')+'</td><td class="n">'+(r.sw?fm(r.sw):'—')+'</td><td class="n"><b>'+r.qty+'</b></td><td class="n"><b>'+fm(r.line)+'</b></td></tr>';
 }
 function totalsHTML(C){
   var T=C.T, t='';
