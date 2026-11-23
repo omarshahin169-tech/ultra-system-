@@ -115,6 +115,16 @@ table.sum tr.neg td:last-child{color:#b42318}
 .qh .meta .ttl{font-size:17px;font-weight:800;color:var(--ink);background:var(--accent);padding:2px 12px;border-radius:6px;display:inline-block;margin-bottom:3px}
 .qcl{display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;font-size:12.5px;background:#f7f7f5;border:1px solid #e2e2de;border-radius:8px;padding:8px 12px;margin-bottom:8px}
 .qcl b{color:var(--navy)}
+table.qinfo{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:8px;table-layout:fixed}
+table.qinfo th{width:13%;background:#f1f1ee;color:var(--ink);font-weight:800;text-align:right;padding:4px 8px;border:1px solid #e2e2de;border-right:3px solid var(--accent)}
+table.qinfo td{padding:4px 8px;border:1px solid #e2e2de;font-weight:600}
+.qartw{flex:1;display:flex;justify-content:center;align-items:center;min-height:170px}
+.qart{width:230px;height:auto}
+.qnotes{margin:0;padding-inline-start:22px;font-size:11.5px;line-height:1.75}
+.qsign{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;font-size:11.5px}
+.qsign div{border-top:1.5px solid #3d4044;padding-top:5px;display:flex;flex-direction:column;min-height:42px}
+.qsign small{color:#6b6e72;font-weight:700}
+.qsign b{color:var(--ink);font-size:12.5px;margin-top:2px}
 .qintro{font-size:12.5px;margin:4px 0 8px;font-weight:600}
 table.qt{width:100%;border-collapse:collapse;font-size:11.5px;table-layout:fixed}
 table.qt th{background:var(--accent);color:var(--ink);font-weight:800;font-size:10.5px;padding:6px 2px;border:1px solid #c9a33a;line-height:1.25}
@@ -187,6 +197,10 @@ table.qt td.sy{white-space:nowrap;font-size:10.5px;font-weight:700}
       <label class="f">عناية (المسؤول)<input id="q-attn" data-q="attn"></label>
       <label class="f">اسم المشروع<input id="q-project" data-q="project"></label>
       <label class="f">تليفون العميل<input id="q-phone" data-q="phone" inputmode="tel"></label>
+      <label class="f">موقع المشروع<input id="q-site" data-q="site" placeholder="مثال: القطامية هايتس – مبنى S2 – الدور الأول"></label>
+      <label class="f">اللون<input id="q-color" data-q="color" placeholder="مثال: رمادي RAL 7016"></label>
+      <label class="f">مكان التركيب<select id="q-install" data-q="install"><option value="">—</option><option>خارج الفتحة</option><option>داخل الفتحة</option><option>داخل الحلق</option></select></label>
+      <label class="f">مندوب المبيعات<input id="q-rep" data-q="rep"></label>
       <label class="f">تاريخ عرض السعر<input id="q-date" data-q="date" type="date"></label>
       <label class="f">الموتور لكل الفتحات<select id="q-brand"></select></label>
     </div>
@@ -290,6 +304,7 @@ table.qt td.sy{white-space:nowrap;font-size:10.5px;font-weight:700}
       <label class="f">العنوان (يظهر أسفل كل صفحة)<input data-s="company.address"></label>
       <label class="f">التليفونات<input data-s="company.phones"></label>
       <label class="f">مقدمة العرض<input data-s="company.intro"></label>
+      <label class="f">إعداد العرض (يظهر أسفل العرض)<input data-s="company.preparedBy" placeholder="مثال: م/ ..."></label>
       <label class="f">الشعار (صورة)<input type="file" id="logo-in" accept="image/*"></label>
     </div>
     <div class="row" style="margin-top:8px"><img id="logo-pv" style="max-height:50px;display:none"><button class="btn sm danger" id="logo-del" style="display:none">حذف الشعار</button></div>
@@ -376,6 +391,7 @@ table.qt td.sy{white-space:nowrap;font-size:10.5px;font-weight:700}
     <div class="grid g2 sm1">
       <label class="f">أماكن الفتحات (كل سطر مكان)<textarea data-s="locations" data-lines="1"></textarea></label>
       <label class="f">مواصفات عامة (تظهر في كل عرض)<textarea data-s="generalSpecs" data-lines="1"></textarea></label>
+      <label class="f">ملاحظات عامة (تظهر مرقّمة في كل عرض)<textarea data-s="generalNotes" data-lines="1" style="min-height:140px"></textarea></label>
       <label class="f">شروط الدفع الافتراضية (للعروض الجديدة)<textarea data-s="terms" data-lines="1"></textarea></label>
     </div>
   </div>
@@ -518,7 +534,7 @@ function defaultSystems(){ return [
 function withSpecs(list){ list.forEach(function(x){ var d=SYS_SPECS[x.id]; if(d){ x.specTitle=d.t; x.spec=d.s; } }); return list; }
 function defaultSettings(){
   return {
-    v:8,
+    v:9,
     company:{name:'ULTRA SYSTEM',tagline:'ROLLER SHUTTER SYSTEMS',address:'OFFICE : the 1 settlement – El Yasmeen 1 – Ahmed Shawky street – Villa 11',phones:'002-01050500980 - 01041527243',intro:'تتشرف الشركة بتقديم عرضها لسيادتكم للشيش الحصيرة طبقاً للبيان التالي:',logo:DEFAULT_LOGO},
     basis:'width',
     systems:withSpecs(defaultSystems()),
@@ -536,6 +552,7 @@ function defaultSettings(){
     vatRate:14,
     locations:['حمام','ضيوف','صالة','مطبخ','غرفة','ليفينج','رووف','أخرى'],
     generalSpecs:['إكسسوار SH.'],
+    generalNotes:['مدة صلاحية العرض 7 أيام من تاريخه.','المقاسات تقريبية، ويتم اعتماد المقاسات النهائية بعد الرفع على الطبيعة.','أي تعديل في المقاسات أو الكميات يستلزم إعادة التسعير.','العرض لا يشمل أي أعمال كهرباء أو مدني أو تكسير.','فك الوحدات القديمة وتجهيز الموقع للتركيب على مسؤولية العميل.','مدة التوريد يتم تحديدها عند التعاقد.'],
     terms:['70% دفعة مقدمة عند التعاقد.','20% عند التوريد.','10% عند الاستلام النهائي.']
   };
 }
@@ -548,7 +565,7 @@ var LS_S='ultra_settings_v1', LS_Q='ultra_quotes_v1';
 
 function newQuote(){
   return {id:uid(),no:'',client:'',attn:'',project:'',phone:'',date:today(),brand:'none',
-    unit:'cm',swdef:true,items:[],tmode:'cairo',tman:'',disc:0,vat:false,terms:S.terms.join('\n'),notes:'',created:Date.now(),updated:Date.now()};
+    unit:'cm',site:'',color:'',install:'',rep:'',swdef:true,items:[],tmode:'cairo',tman:'',disc:0,vat:false,terms:S.terms.join('\n'),notes:'',created:Date.now(),updated:Date.now()};
 }
 function nextNo(){
   var y=new Date().getFullYear(), mx=0;
@@ -614,6 +631,8 @@ function mergeSettings(saved){
     s.v=7;
   }
   if(!(saved.v>=8)){ var zd=defaultSystems().filter(function(x){return x.id==='zinc';})[0]; s.systems.forEach(function(x){ if(x.id==='zinc' && !String(x.spec||'').trim()){ x.spec=zd.spec; x.specTitle=x.specTitle||zd.specTitle; } }); s.v=8; }
+  if(!(saved.v>=9)){ if(!Array.isArray(saved.generalNotes)) s.generalNotes=defaultSettings().generalNotes.slice(); s.v=9; }
+  if(!Array.isArray(s.generalNotes)) s.generalNotes=[];
   if(!Array.isArray(s.boxSpecs)) s.boxSpecs=[];
   if(!s.rcName) s.rcName=defaultSettings().rcName;
   delete s.capacities; delete s.remotePrice;
@@ -681,7 +700,7 @@ function toCm(Q){
 function loadQuoteToForm(){
   toCm(Q);
   $('#qno').textContent=Q.no||'عرض جديد';
-  ['client','attn','project','phone','date','tmode','tman','disc','terms','notes'].forEach(function(k){ var e=$('[data-q="'+k+'"]'); if(e) e.value=Q[k]===undefined?'':Q[k]; });
+  ['client','attn','project','phone','site','color','install','rep','date','tmode','tman','disc','terms','notes'].forEach(function(k){ var e=$('[data-q="'+k+'"]'); if(e) e.value=Q[k]===undefined?'':Q[k]; });
   $('#q-brand').innerHTML=brandOptions(Q.brand);
   $('#q-vat').checked=!!Q.vat; $('#q-swdef').checked=!!Q.swdef;
   $('#loc-list').innerHTML=S.locations.map(function(l){return '<option value="'+esc(l)+'">';}).join('');
@@ -934,12 +953,36 @@ function pageShell(){
   p.innerHTML='<div class="qc"></div><div class="qf"><div>'+esc(c.address)+'</div><div>'+esc(c.phones)+'</div><div class="pg"></div></div>';
   return p;
 }
+function infoHTML(C){
+  var sys=[], br=[], seen={}, rc=false, sw=false;
+  C.rows.forEach(function(r){ if(r.sys){ var n=(r.sys.label||r.sys.name)+(r.hf?' (هارد فوم)':''); if(!seen['s'+n]){seen['s'+n]=1; sys.push(n);} }
+    var m=r.motor; if(m.brand!=='none'&&m.name&&!seen['m'+m.name]){ seen['m'+m.name]=1; br.push(m.name); } if(m.rcv) rc=true; if(r.sw) sw=true; });
+  var op=[]; if(br.length) op.push('موتور كهربائي'); if(rc) op.push('ريموت + ريسيفر'); if(sw) op.push('مفتاح');
+  var cells=[['السادة',Q.client],['المشروع',Q.project],['الموقع',Q.site],['عناية',Q.attn],['تليفون',Q.phone],
+    ['المنتج','شيش حصيرة ألومنيوم'],['الشريحة',sys.join(' / ')],['الموتور',br.join(' / ')],['التشغيل',op.join(' + ')],['اللون',Q.color],['التركيب',Q.install]];
+  cells=cells.filter(function(c,i){ return i<2 || String(c[1]||'').trim(); });
+  return '<table class="qinfo">'+cells.map(function(c,i){ return (i%2===0?'<tr>':'')+'<th>'+c[0]+'</th><td>'+esc(c[1]||'—')+'</td>'+(i%2===1||i===cells.length-1?(i%2===0?'<th></th><td></td>':'')+'</tr>':''); }).join('')+'</table>';
+}
+function shutterSVG(){
+  var t='<svg class="qart" viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+  t+='<rect x="28" y="36" width="14" height="140" fill="#4a4d52"/><rect x="31" y="36" width="3" height="140" fill="#6b6f74"/>';
+  t+='<rect x="198" y="36" width="14" height="140" fill="#4a4d52"/><rect x="206" y="36" width="3" height="140" fill="#6b6f74"/>';
+  for(var i=0;i<12;i++){ var y=40+i*11;
+    t+='<rect x="42" y="'+y+'" width="156" height="11" fill="#b9bcc0"/>'+
+       '<rect x="42" y="'+y+'" width="156" height="4" fill="#d6d8db"/>'+
+       '<rect x="42" y="'+(y+9)+'" width="156" height="2" fill="#8f9398"/>'; }
+  t+='<rect x="42" y="172" width="156" height="6" fill="#3d4044"/>';
+  t+='<rect x="18" y="8" width="204" height="30" rx="6" fill="#3d4044"/><rect x="18" y="8" width="204" height="10" rx="5" fill="#5b5f64"/>';
+  t+='<rect x="18" y="34" width="204" height="5" fill="#f5c542"/>';
+  t+='<text x="120" y="29" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#f5c542" letter-spacing="2">ULTRA SYSTEM</text>';
+  t+='<rect x="28" y="182" width="184" height="3" rx="1.5" fill="#000" opacity=".08"/></svg>';
+  return t;
+}
 function headerHTML(C){
   var c=S.company;
   return '<div class="qh">'+(c.logo?'<img src="'+c.logo+'">':'<div class="nm"><b>'+esc(c.name)+'</b><span>'+esc(c.tagline)+'</span></div>')+
     '<div class="meta"><div class="ttl">عرض سعر شيش حصيرة</div><div>رقم: <b>'+esc(Q.no||'—')+'</b></div><div>التاريخ: <b>'+esc((Q.date||'').split('-').reverse().join('/'))+'</b></div></div></div>'+
-    '<div class="qcl"><div>السادة / <b>'+esc(Q.client||'—')+'</b></div><div>المشروع: <b>'+esc(Q.project||'—')+'</b></div>'+
-    (Q.attn?'<div>عناية: <b>'+esc(Q.attn)+'</b></div>':'')+(Q.phone?'<div>تليفون: <b>'+esc(Q.phone)+'</b></div>':'')+'</div>'+
+    infoHTML(C)+
     (c.intro?'<div class="qintro">'+esc(c.intro)+'</div>':'');
 }
 var COLS='<colgroup><col style="width:20px"><col style="width:50px"><col style="width:28px"><col style="width:86px"><col style="width:34px"><col style="width:36px"><col style="width:44px"><col style="width:38px"><col style="width:50px"><col style="width:62px"><col style="width:44px"><col style="width:44px"><col style="width:32px"><col style="width:28px"><col style="width:58px"></colgroup>';
@@ -964,7 +1007,7 @@ function totalsHTML(C){
   if(Q.vat) tr('ضريبة القيمة المضافة '+T.vatRate+'%',fm(T.vat));
   if(T.discount) tr('الصافي بعد الخصم',fm(T.subtotal-T.discount));
   tr('الإجمالي النهائي',U(fm(T.grand),'ج.م'),'g');
-  return '<div class="qtot"><table>'+t+'</table></div>';
+  return '<div class="qtot"><div class="qartw">'+shutterSVG()+'</div><table>'+t+'</table></div>';
 }
 function lines(t){ return (Array.isArray(t)?t:String(t||'').split('\n')).map(function(x){return String(x).trim();}).filter(Boolean); }
 function specItem(x){ return /^★/.test(x)?'<li class="hl">'+esc(x.replace(/^★\s*/,''))+'</li>':'<li>'+esc(x)+'</li>'; }
@@ -996,8 +1039,16 @@ function termsHTML(){
   var pct=payTotal(tl);
   if(!Q.vat && !tl.some(function(x){return x.indexOf('ضريبة')>=0;})) tl.push('الأسعار غير شاملة ضريبة القيمة المضافة.');
   var h=tl.length?'<div class="qsec qpay"><h4>شروط الدفع – Payment Terms</h4><ul>'+tl.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>'+(pct?'<div class="sum">إجمالي الدفعات: '+U(pct+'%')+'</div>':'')+'</div>':'';
-  if(String(Q.notes||'').trim()) h+='<div class="qsec"><h4>ملاحظات</h4><div class="qnote">'+esc(Q.notes)+'</div></div>';
+  if(String(Q.notes||'').trim()) h+='<div class="qsec"><h4>ملاحظات خاصة بالعرض</h4><div class="qnote">'+esc(Q.notes)+'</div></div>';
   return h;
+}
+function notesHTML(){
+  var nl=lines(S.generalNotes); if(!nl.length) return '';
+  return '<div class="qsec"><h4>ملاحظات عامة</h4><ol class="qnotes">'+nl.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol></div>';
+}
+function signHTML(){
+  var pb=(S.company&&S.company.preparedBy)||'';
+  return '<div class="qsign"><div><small>مندوب المبيعات</small><b>'+esc(Q.rep||'')+'</b></div><div><small>إعداد</small><b>'+esc(pb)+'</b></div><div><small>اعتماد</small><b></b></div></div>';
 }
 function buildPages(target){
   target.innerHTML='';
@@ -1018,6 +1069,8 @@ function buildPages(target){
   sysSpecBlocks(C).forEach(addBlock);
   var sp=specsHTML(C); if(sp) addBlock(sp);
   var tm=termsHTML(); if(tm) addBlock(tm);
+  var nt=notesHTML(); if(nt) addBlock(nt);
+  addBlock(signHTML());
   pages.forEach(function(p,i){ p.querySelector('.pg').textContent='Page '+(i+1)+' / '+pages.length; });
   return pages;
 }
